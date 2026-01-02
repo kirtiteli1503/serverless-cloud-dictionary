@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Serverless Cloud Dictionary</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      width: 420px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      background: #0073bb;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #005a8c;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 12px;
+      background: #eef5ff;
+      border-radius: 5px;
+      min-height: 40px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <h2>☁️ Cloud Dictionary</h2>
+
+    <input
+      id="termInput"
+      placeholder="Enter cloud term (e.g. AWS Lambda)"
+    />
+
+    <button onclick="searchTerm()">Search</button>
+
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    // ✅ Correct API Gateway URL with stage
+    const API_URL =
+      "https://swp5t5jtwj.execute-api.ap-south-1.amazonaws.com/prod";
+
+    async function searchTerm() {
+      const term = document.getElementById("termInput").value.trim();
+      const resultDiv = document.getElementById("result");
+
+      if (!term) {
+        resultDiv.innerHTML = "Please enter a term.";
+        return;
+      }
+
+      resultDiv.innerHTML = "Searching...";
+
+      try {
+        const response = await fetch(
+          `${API_URL}/search?term=${encodeURIComponent(term)}`
+        );
+
+        if (!response.ok) {
+          resultDiv.innerHTML = "Term not found or server error.";
+          return;
+        }
+
+        const data = await response.json();
+
+        resultDiv.innerHTML = `
+          <strong>Term:</strong> ${data.term}<br><br>
+          <strong>Definition:</strong> ${data.definition}<br><br>
+          <strong>Category:</strong> ${data.category}
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = "Error fetching data";
+      }
+    }
+  </script>
+
+</body>
+</html>
